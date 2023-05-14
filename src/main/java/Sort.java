@@ -64,8 +64,8 @@ public class Sort<T extends Comparable<T>> {
     }
 
     private void bubbleSort(T[] array, int start, int end) {
-        for (int i = start; i < end - 1; i++) {
-            for (int j = start; j < end - 1 - i; j++) {
+        for (int i = start; i <= end; i++) {
+            for (int j = start; j < end - i; j++) {
                 if (array[j].compareTo(array[j + 1]) > 0) {
                     swap(array, j, j + 1);
                 }
