@@ -130,7 +130,43 @@ public class Sort <T extends Comparable<T>> {
     }
 
     public void mergeSortRecursive(T[] array){
-        return;
+        mergeSortRecursive(array,0, array.length-1);
+    }
+    public void mergeSortRecursive(T[] arr,int left,int right){
+        int mid;
+        if(left<right){
+            mid = (left+right) / 2;
+            mergeSortRecursive(arr,left,mid);
+            mergeSortRecursive(arr,mid+1,right);
+            merge(arr, right, mid, left);
+        }
+    }
+
+    private void merge(T[] arr, int right, int mid, int left) {
+        //size of subbarrays
+        int n1 = mid - left + 1;
+        int n2 = right - mid;
+        T[] leftAr = (T[]) Array.newInstance(Comparable.class, n1);
+        T[] rightAr = (T[]) Array.newInstance(Comparable.class, n2);
+
+        for(int i=0;i<n1;i++){
+            leftAr[i]=arr[left+i];
+        }
+        for(int i=0;i<n2;i++){
+            rightAr[i]=arr[mid + 1 + i];
+        }
+
+        int l=0,r=0;
+        while(l+r < arr.length){
+            if(l==n1){//finished left -> insert from right
+                arr[l+r] = rightAr[r++];
+            } else if (r==n2) {//else, if finished right -> insert from left
+                arr[l+r] = leftAr[l++];
+            }
+            else{//both sub-arr have elements
+                arr[l+r] = leftAr[l].compareTo(rightAr[r])<=0 ? leftAr[l++] : rightAr[r++];
+            }
+        }
     }
 
     public void mergeSortIterative(T[] array){
