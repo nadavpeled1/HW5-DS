@@ -1,4 +1,7 @@
-public class Sort <T extends Comparable<T>> {
+import java.lang.reflect.Array;
+
+public class Sort<T extends Comparable<T>> {
+    private int threshold = 1; //a threshold to determine if to use the naive sort or the algorithm
     /** Lecture quick sort's subroutines - Main function and private helper functions */
     public void quickSortClass(T[] array){
         quickSort(array, 0, array.length - 1, "Class");
@@ -6,7 +9,7 @@ public class Sort <T extends Comparable<T>> {
 
     private void quickSort(T[] array, int p, int r, String type){
         int pivotIndex;
-        if (r - p > 2){
+        if (r - p > threshold - 1){
             if (type.equals("Class")) {
                 pivotIndex = partitionClass(array, p, r);
             }
@@ -17,13 +20,13 @@ public class Sort <T extends Comparable<T>> {
             quickSort(array, pivotIndex, r, type);
         }
         else {
-            bubbleSort(array);
+            bubbleSort(array,p,r);
         }
     }
 
     private int partitionClass(T[] array, int p, int r){
         T pivot = array[r];
-        int rightIndex = r, leftIndex = p - 1;
+            int rightIndex = r, leftIndex = p - 1;
         T temp;
 
         while (true){
@@ -35,13 +38,14 @@ public class Sort <T extends Comparable<T>> {
                 leftIndex ++;
             } while (leftIndex <= r && array[leftIndex].compareTo(pivot) < 0);
 
-            if (leftIndex < rightIndex){
-                temp = array[leftIndex];
+            if (leftIndex < rightIndex){ //if found 2 elements to swap
+                temp = array[leftIndex]; //Swap them
                 array[leftIndex] = array[rightIndex];
                 array[rightIndex] = temp;
             }
 
-            else{
+            else{ //leftIndex and RightIndex crossed,
+                // swap pivot with R+1
                 temp = array[r];
                 array[r] = array[rightIndex+1];
                 array[rightIndex+1] = temp;
@@ -55,11 +59,18 @@ public class Sort <T extends Comparable<T>> {
         for (int i = 0; i < n - 1; i++)
             for (int j = 0; j < n - i - 1; j++)
                 if (array[j].compareTo(array[j + 1]) > 0 ) {
-                    // swap arr[j+1] and arr[j]
-                    T temp = array[j];
-                    array[j] = array[j + 1];
-                    array[j + 1] = temp;
+                    swap(array,j,j+1);
                 }
+    }
+
+    private void bubbleSort(T[] array, int start, int end) {
+        for (int i = start; i < end - 1; i++) {
+            for (int j = start; j < end - 1 - i; j++) {
+                if (array[j].compareTo(array[j + 1]) > 0) {
+                    swap(array, j, j + 1);
+                }
+            }
+        }
     }
 
     public void quickSortRecitation(T[] array){
@@ -106,7 +117,7 @@ public class Sort <T extends Comparable<T>> {
         int[] arrB = new int[arrA.length];
         int[] arrC = new int[base];
 
-        for (int i = 0; i < base; i++){
+        for (int i = 0; i < base; i++){ //we can delete that, by default java puts 0
             arrC[i] = 0;
         }
 
@@ -130,20 +141,24 @@ public class Sort <T extends Comparable<T>> {
     }
 
     public void mergeSortRecursive(T[] array){
-        mergeSortRecursive(array,0, array.length-1);
+        mergeSortRecursive(array, 0, array.length-1);
     }
-    public void mergeSortRecursive(T[] arr,int left,int right){
-        int mid;
-        if(left<right){
-            mid = (left+right) / 2;
-            mergeSortRecursive(arr,left,mid);
-            mergeSortRecursive(arr,mid+1,right);
-            merge(arr, right, mid, left);
+
+    public void mergeSortRecursive(T[] arr, int left, int right){
+        if (left < right) {
+            if (right - left + 1 <= threshold) {
+                bubbleSort(arr, left, right);
+            } else {
+                int mid = (left + right) / 2;
+                mergeSortRecursive(arr, left, mid);
+                mergeSortRecursive(arr, mid + 1, right);
+                merge(arr, left, mid, right);
+            }
         }
     }
 
-    private void merge(T[] arr, int right, int mid, int left) {
-        //size of subbarrays
+    private void merge(T[] arr, int left, int mid, int right) {
+        //size of sub-arrays
         int n1 = mid - left + 1;
         int n2 = right - mid;
         T[] leftAr = (T[]) Array.newInstance(Comparable.class, n1);
@@ -156,27 +171,48 @@ public class Sort <T extends Comparable<T>> {
             rightAr[i]=arr[mid + 1 + i];
         }
 
-        int l=0,r=0;
-        while(l+r < arr.length){
-            if(l==n1){//finished left -> insert from right
-                arr[l+r] = rightAr[r++];
-            } else if (r==n2) {//else, if finished right -> insert from left
-                arr[l+r] = leftAr[l++];
+        int i = 0, j = 0, k = left;
+        while (i < n1 && j < n2) {
+            if (leftAr[i].compareTo(rightAr[j]) <= 0) {
+                arr[k++] = leftAr[i++];
+            } else {
+                arr[k++] = rightAr[j++];
             }
-            else{//both sub-arr have elements
-                arr[l+r] = leftAr[l].compareTo(rightAr[r])<=0 ? leftAr[l++] : rightAr[r++];
-            }
+        }
+        while (i < n1) {
+            arr[k++] = leftAr[i++];
+        }
+
+        while (j < n2) {
+            arr[k++] = rightAr[j++];
         }
     }
 
-    public void mergeSortIterative(T[] array){
-        return;
+    public void mergeSortIterative(T[] array) {
+        int n = array.length;
+        if(n<=threshold){
+            bubbleSort(array);
+        }
+        else{
+            // Divide the array into sub-arrays of size 1, then merge them pairwise
+            for (int size = 1; size < n; size *= 2) {
+                for (int left = 0; left < n - size; left += 2 * size) {
+                    int mid = left + size - 1;
+                    int right = Math.min(left + 2 * size - 1, n - 1); //prevent out of bound at last iteration
+                    merge(array, left, mid, right);
+                }
+            }
+        }
+    }
+    private void swap(T[] array, int i, int j) {
+        T temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
     }
 
     public void setNaiveSortThreshold(int threshold){
-        return;
+        this.threshold = threshold;
     }
-
 
 
 }
