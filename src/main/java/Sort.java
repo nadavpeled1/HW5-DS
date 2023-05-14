@@ -128,8 +128,20 @@ public class Sort <T extends Comparable<T>> {
             arrA[i] = arrB[i];
         }
     }
+    public void mergeSortRecursive(T[] array){
+        mergeSortRecursive(array,0, array.length-1);
+    }
+    public void mergeSortRecursive(T[] arr, int left, int right){
+        int mid;
+        if(left<right){
+            mid = (left+right) / 2;
+            mergeSortRecursive(arr,left,mid);
+            mergeSortRecursive(arr,mid+1,right);
+            merge(arr, left, mid, right);
+        }
+    }
 
-       private static void merge(T[] arr, int left, int mid, int right) {
+    private void merge(T[] arr, int left, int mid, int right) {
         //size of subbarrays
         int n1 = mid - left + 1;
         int n2 = right - mid;
@@ -144,22 +156,32 @@ public class Sort <T extends Comparable<T>> {
         }
 
         int l=0,r=0;
+        int k = left;
         while(l+r < (n1 + n2)){
             if(l==n1){//finished left -> insert from right
-                arr[left+l+r] = rightAr[r++];
+                arr[k++] = rightAr[r++];
             } else if (r==n2) {//else, if finished right -> insert from left
-                arr[left+l+r] = leftAr[l++];
+                arr[k++] = leftAr[l++];
             }
             else{//both sub-arr have elements
-                arr[left+l+r] = leftAr[l].compareTo(rightAr[r])<=0 ? leftAr[l++] : rightAr[r++];
+                arr[k++] = leftAr[l].compareTo(rightAr[r])<=0 ? leftAr[l++] : rightAr[r++];
             }
         }
     }
 
-    public void mergeSortIterative(T[] array){
-        return;
-    }
+    public void mergeSortIterative(T[] array) {
+        int n = array.length;
 
+        // Divide the array into subarrays of size 1, then merge them pairwise
+        for (int size = 1; size < n; size *= 2) {
+            for (int left = 0; left < n - size; left += 2 * size) {
+                int mid = left + size - 1;
+                int right = Math.min(left + 2 * size - 1, n - 1); //prevent out of bound at last iteration
+                merge(array, left, mid, right);
+            }
+        }
+    }
+    
     public void setNaiveSortThreshold(int threshold){
         return;
     }
