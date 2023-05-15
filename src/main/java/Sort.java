@@ -1,7 +1,7 @@
 import java.lang.reflect.Array;
 
 public class Sort<T extends Comparable<T>> {
-    private int threshold = 1; //a threshold to determine if to use the naive sort or the algorithm
+    private int threshold = 3; //a threshold to determine if to use the naive sort or the algorithm
     /** Lecture quick sort's subroutines - Main function and private helper functions */
     public void quickSortClass(T[] array){
         quickSort(array, 0, array.length - 1, "Class");
@@ -16,8 +16,12 @@ public class Sort<T extends Comparable<T>> {
             else {
                 pivotIndex = partitionRecitation(array, p, r);
             }
-            quickSort(array, p, pivotIndex - 1, type);
-            quickSort(array, pivotIndex, r, type);
+            if (pivotIndex > p){
+                quickSort(array, p, pivotIndex - 1, type);
+            }
+            if (pivotIndex < r){
+                quickSort(array, pivotIndex, r, type);
+            }
         }
         else {
             bubbleSort(array,p,r);
@@ -65,7 +69,7 @@ public class Sort<T extends Comparable<T>> {
 
     private void bubbleSort(T[] array, int start, int end) {
         for (int i = start; i <= end; i++) {
-            for (int j = start; j < end - i; j++) {
+            for (int j = start; j < end; j++) {
                 if (array[j].compareTo(array[j + 1]) > 0) {
                     swap(array, j, j + 1);
                 }
@@ -82,19 +86,19 @@ public class Sort<T extends Comparable<T>> {
         int left = p - 1;
         T temp;
 
-        for (int right = p; right < r - 1; right++) {
-            if (array[right].compareTo(pivot) <= 0){
-                left ++;
+        for (int right = p; right < r ; right++) {
+            if (array[right].compareTo(pivot) <= 0) {
+                left++;
                 // swap array[left] <-> array[right]
                 temp = array[left];
                 array[left] = array[right];
                 array[right] = temp;
             }
-            // swap array[left + 1] <-> pivot
-            temp = array[left + 1];
-            array[left + 1] = array[r];
-            array[r] = temp;
         }
+        // swap array[left + 1] <-> pivot
+        temp = array[left + 1];
+        array[left + 1] = array[r];
+        array[r] = temp;
         return left + 1;
     }
 
