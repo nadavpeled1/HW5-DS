@@ -22,19 +22,20 @@ public class Main {
 
             for (int k = 0; k < NUMITER; k++) {
                 Integer[] array = new Integer[n];
+                int[] radixArray = new int[n];
                 Integer[] copy;
+                int[] radixCopy;
 
                 //generate random array with Integer [0,MAX_Integer]
                 for (int i = 0; i < n; i++) {
-                    array[i] = random.nextInt(Integer.MAX_VALUE);
+                    array[i] = random.nextInt();
+                    radixArray[i] = array[i].intValue();
                 }
 
-                /* 1) clone the random Array each algo measure
-                   2) use the i'th algorithem on the clone
-                   3) save the result
-                 */
                 for (int i = 0; i < 6; i++) {
-                    copy = copyIntegerArray(array);
+                    copy = Arrays.copyOf(array, n);
+                    radixCopy = Arrays.copyOf(radixArray, n);
+
                     long startTime = System.currentTimeMillis();
                     switch (i) {
                         case 0:
@@ -49,10 +50,10 @@ public class Main {
                         case 3:
                             sorter.mergeSortIterative(copy);
                             break;
-                        case 4://this one gets different input since it works specificly with int[] type
-                            sorter.radixSort(copyIntegerTOint(copy), 10);
+                        case 4:
+                            sorter.radixSort(radixCopy,10);
                             break;
-                        case 5://naive Sort
+                        case 5: //Java's sort
                             Arrays.sort(copy);
                             break;
                     }
