@@ -14,14 +14,18 @@ public class Main {
 
             for (int k = 0; k < NUMITER; k++) {
                 Integer[] array = new Integer[n];
+                int[] radixArray = new int[n];
                 Integer[] copy;
+                int[] radixCopy;
 
                 for (int i = 0; i < n; i++) {
                     array[i] = random.nextInt();
+                    radixArray[i] = array[i].intValue();
                 }
 
-                for (int i = 0; i < 4; i++) {
+                for (int i = 0; i < 6; i++) {
                     copy = Arrays.copyOf(array, n);
+                    radixCopy = Arrays.copyOf(radixArray, n);
 
                     long startTime = System.currentTimeMillis();
                     switch (i) {
@@ -38,10 +42,10 @@ public class Main {
                             sorter.mergeSortIterative(copy);
                             break;
                         case 4:
-                            sorter.radixSort(copy,10);
+                            sorter.radixSort(radixCopy,10);
                             break;
-                        case 5://naive Sort
-                            sorter.bubbleSort(copy);
+                        case 5: //Java's sort
+                            Arrays.sort(copy);
                             break;
                     }
                     long endTime = System.currentTimeMillis();
